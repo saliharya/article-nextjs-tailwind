@@ -1,5 +1,3 @@
-export interface UserProfileResponse {
-    id: string;
-    username: string;
-    role: "user" | "admin";
-}
+import { User } from "@/models/User";
+
+export interface UserProfileResponse extends User { }
