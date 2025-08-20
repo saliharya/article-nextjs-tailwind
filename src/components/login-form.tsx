@@ -1,20 +1,42 @@
+'use client'
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Image from "next/image"
+import { useAppDispatch, useAppSelector } from "@/store/hooks"
+import { useState } from "react"
+import { fetchProfile, loginUser } from "@/store/slices/authSlice"
+import { useRouter } from "next/navigation"
 
 export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
+
+    const dispatch = useAppDispatch()
+    const { loading, error, user } = useAppSelector((state) => state.authReducer)
+    const router = useRouter()
+
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+
+        const result = await dispatch(loginUser({ username: username, password }))
+
+        if (loginUser.fulfilled.match(result)) {
+            await dispatch(fetchProfile())
+
+            router.push("/")
+        } else {
+            console.error('Login failed: ', result.payload)
+        }
+    }
+
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
@@ -33,15 +55,17 @@ export function LoginForm({
                         </div>
                         Logoipsum
                     </a>
-                    <form>
+                    <form onSubmit={handleSubmit}>
                         <div className="grid gap-6">
                             <div className="grid gap-6">
                                 <div className="grid gap-3">
-                                    <Label htmlFor="email">Username</Label>
+                                    <Label htmlFor="username">Username</Label>
                                     <Input
-                                        id="email"
-                                        type="email"
+                                        id="username"
+                                        type="username"
                                         placeholder="Input username"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
                                         required
                                     />
                                 </div>
@@ -53,6 +77,8 @@ export function LoginForm({
                                         id="password"
                                         type="password"
                                         placeholder="Input password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
                                         required />
                                 </div>
                                 <Button type="submit" className="w-full">
@@ -61,7 +87,7 @@ export function LoginForm({
                             </div>
                             <div className="text-center text-sm">
                                 Don&apos;t have an account?{" "}
-                                <a href="#" className="underline underline-offset-4">
+                                <a href="/register" className="underline underline-offset-4">
                                     Register
                                 </a>
                             </div>
