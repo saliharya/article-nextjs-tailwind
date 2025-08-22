@@ -13,13 +13,21 @@ import {
     PaginationNext,
     PaginationEllipsis,
 } from "@/components/ui/pagination"
+import { useRouter } from "next/navigation"
 
-export default function ArticleContent() {
+interface ArticleContentProps {
+    isDetailPage?: boolean
+    currentId?: string
+}
+
+export default function ArticleContent({ isDetailPage = false, currentId }: ArticleContentProps) {
 
     const dispatch = useAppDispatch()
+    const router = useRouter();
     const { items, loading, error, page, limit, total, selectedCategory, searchTerm } = useAppSelector(
-        (state) => state.articleReducer
+        state => state.articleReducer.list
     )
+
 
     const totalPages = Math.ceil(total / limit)
 
@@ -51,6 +59,17 @@ export default function ArticleContent() {
         return pages
     }
 
+    const handleClick = (id: string) => {
+        router.push(`/articles/${id}`);
+    }
+
+    const displayedArticles = isDetailPage
+        ? items
+            .filter(a => a.id !== currentId)
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 3)
+        : items
+
     return (
         <div className="w-full min-h-screen flex justify-center">
             <div className="w-[1240px] pt-4 flex flex-col gap-5">
@@ -58,14 +77,18 @@ export default function ArticleContent() {
                     Showing : {Math.min(page * limit, total)} of {total} articles
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-[60px] lg:px-0 lg:py-0 pt-10 pb-14 px-5">
-                    {items.map((article) => (
-                        <ArticleItem key={article.id} article={article} />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:px-0 lg:py-0 pt-10 pb-14 px-5">
+                    {displayedArticles.map((article) => (
+                        <ArticleItem
+                            key={article.id}
+                            article={article}
+                            onClick={() => handleClick(article.id)}
+                        />
                     ))}
                 </div>
 
-                {totalPages > 1 && (
-                    <Pagination>
+                {((totalPages > 1) && !isDetailPage) && (
+                    <Pagination className="mb-14">
                         <PaginationContent>
                             <PaginationItem>
                                 <PaginationPrevious

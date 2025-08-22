@@ -7,13 +7,16 @@ type LogoProps = {
 }
 
 export default function Logo({ variant = "black" }: LogoProps) {
+    const logoSrc = variant === "white" ? "/icons/logo-white.svg" : "/icons/Logo.svg"
+
     return (
         <a
-            href="#" className="flex items-center gap-2 font-medium"
+            href="#"
+            className="flex items-center gap-2 font-medium"
         >
             <div className="flex w-6 h-6 items-center justify-center rounded-md">
                 <Image
-                    src="/icons/Logo.svg"
+                    src={logoSrc}
                     alt="Logo"
                     width={20.18}
                     height={22.33}

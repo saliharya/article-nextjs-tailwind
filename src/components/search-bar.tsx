@@ -2,7 +2,7 @@
 
 import { Search } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import { Input } from './input'
+import { Input } from './ui/input'
 import { useAppDispatch } from '@/store/hooks';
 import { setSearchTerm } from '@/store/slices/articleSlice';
 

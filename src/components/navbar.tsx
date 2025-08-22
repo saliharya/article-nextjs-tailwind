@@ -6,7 +6,11 @@ import UserInfo from './user-info'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { fetchProfile } from '@/store/slices/authSlice'
 
-export default function Navbar() {
+interface NavbarProps {
+    logoVariant?: "black" | "white"
+}
+
+export default function Navbar({ logoVariant }: NavbarProps) {
     const dispatch = useAppDispatch()
     const { user } = useAppSelector(
         (state) => state.authReducer
@@ -16,12 +20,7 @@ export default function Navbar() {
 
     return (
         <div className='px-8 py-16 w-full bg-white lg:bg-transparent max-h-16 flex flex-row justify-between items-center'>
-            <div className="block lg:hidden">
-                <Logo variant="black" />
-            </div>
-            <div className="hidden lg:block">
-                <Logo variant="white" />
-            </div>
+            <Logo variant={logoVariant} />
             <UserInfo username={user?.username} />
         </div>
 

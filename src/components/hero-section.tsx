@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import heroImage from '../../public/images/hero.jpg'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
 import { ChevronDown } from 'lucide-react'
-import SearchBar from './ui/search-bar'
+import SearchBar from './search-bar'
 import Navbar from './navbar'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { setCategory } from '@/store/slices/articleSlice'
@@ -13,10 +13,26 @@ import { setCategory } from '@/store/slices/articleSlice'
 export default function HeroSection() {
 
     const dispatch = useAppDispatch()
-    const { searchTerm, selectedCategory, items: articles } = useAppSelector(state => state.articleReducer)
+    const { selectedCategory, items: articles } = useAppSelector(state => state.articleReducer.list)
 
     const [isMounted, setIsMounted] = useState(false)
-    useEffect(() => { setIsMounted(true) }, [])
+    const [logoVariant, setLogoVariant] = useState<"black" | "white">("black")
+
+    useEffect(() => {
+        setIsMounted(true)
+
+        const handleResize = () => {
+            if (window.innerWidth >= 1024) {
+                setLogoVariant("white")
+            } else {
+                setLogoVariant("black")
+            }
+        }
+
+        handleResize()
+        window.addEventListener("resize", handleResize)
+        return () => window.removeEventListener("resize", handleResize)
+    }, [])
 
     const categories = useMemo(() => {
         if (!articles) return []
@@ -35,7 +51,7 @@ export default function HeroSection() {
             <div className="absolute inset-0 bg-[#2563EBDB]" />
 
             <div className="absolute top-0 left-0 w-full">
-                <Navbar />
+                <Navbar logoVariant={logoVariant} />
             </div>
 
             <div className="absolute inset-0 flex flex-col items-center justify-center w-full px-4">

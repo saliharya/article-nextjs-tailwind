@@ -6,12 +6,13 @@ import noImage from '../../public/images/no-image.png'
 
 interface ArticleItemProps {
     article: Article
+    onClick?: (article: any) => void
 }
 
-export default function ArticleItem({ article }: ArticleItemProps) {
+export default function ArticleItem({ article, onClick }: ArticleItemProps) {
 
     return (
-        <div className="bg-white overflow-hidden max-w-xl">
+        <div className="overflow-hidden max-w-xl" onClick={() => onClick && onClick(article)}>
             <div className="w-full h-60 relative rounded-[12px] overflow-hidden">
                 <Image
                     src={article.imageUrl ?? noImage}
