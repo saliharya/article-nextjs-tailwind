@@ -15,8 +15,8 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-    user: null,
-    token: null,
+    user: typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null,
+    token: typeof window !== "undefined" ? localStorage.getItem("token") : null,
     loading: false,
     error: null,
 };
@@ -48,8 +48,8 @@ export const registerUser = createAsyncThunk<RegisterResponse, RegisterRequest>(
 export const fetchProfile = createAsyncThunk<UserProfileResponse>(
     "auth/fetchProfile",
     async (_, { getState, rejectWithValue }) => {
-        const state = getState() as { auth: AuthState };
-        const token = state.auth.token;
+        const state = getState() as { authReducer: AuthState };
+        const token = state.authReducer.token || localStorage.getItem("token");
 
         try {
             const res = await apiClient.get<UserProfileResponse>("/auth/profile", {

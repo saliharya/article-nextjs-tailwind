@@ -1,0 +1,90 @@
+'use client'
+
+import Image from 'next/image'
+import React, { useEffect, useMemo, useState } from 'react'
+import heroImage from '../../public/images/hero.jpg'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
+import { ChevronDown } from 'lucide-react'
+import SearchBar from './search-bar'
+import Navbar from './navbar'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { setCategory } from '@/store/slices/articleSlice'
+
+export default function HeroSection() {
+
+    const dispatch = useAppDispatch()
+    const { selectedCategory, items: articles } = useAppSelector(state => state.articleReducer.list)
+
+    const [isMounted, setIsMounted] = useState(false)
+    const [logoVariant, setLogoVariant] = useState<"black" | "white">("black")
+
+    useEffect(() => {
+        setIsMounted(true)
+
+        const handleResize = () => {
+            if (window.innerWidth >= 1024) {
+                setLogoVariant("white")
+            } else {
+                setLogoVariant("black")
+            }
+        }
+
+        handleResize()
+        window.addEventListener("resize", handleResize)
+        return () => window.removeEventListener("resize", handleResize)
+    }, [])
+
+    const categories = useMemo(() => {
+        if (!articles) return []
+        const map = new Map()
+        for (const a of articles) {
+            if (a.category?.id) map.set(a.category.id, a.category)
+        }
+        return Array.from(map.values())
+    }, [articles])
+
+    if (!isMounted) return null
+
+    return (
+        <div className="relative w-full h-[560px] lg:h-[500px]">
+            <Image src={heroImage} alt="hero" fill className="object-cover" />
+            <div className="absolute inset-0 bg-[#2563EBDB]" />
+
+            <div className="absolute top-0 left-0 w-full">
+                <Navbar logoVariant={logoVariant} />
+            </div>
+
+            <div className="absolute inset-0 flex flex-col items-center justify-center w-full px-4">
+                <div className="w-full max-w-[730px] mx-auto text-center">
+                    <p className="text-white text-sm font-bold">Blog genzet</p>
+                    <h1 className="text-white text-4xl font-medium py-4">
+                        The Journal : Design Resources, <br />
+                        Interviews, and Industry News
+                    </h1>
+                    <p className="text-white font-medium">
+                        Your daily dose of design insights!
+                    </p>
+
+                    <div className="pt-8">
+                        <div className="bg-blue-500 flex flex-col lg:flex-row p-1 rounded-md w-full max-w-[608px] mx-auto gap-2">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger className="flex items-center justify-between w-full bg-white rounded-md px-3 py-2 text-sm text-left shadow-sm focus:outline-none lg:w-[344px]">
+                                    {selectedCategory ? categories.find(c => c.id === selectedCategory)?.name : "Select category"}
+                                    <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)]">
+                                    {categories.map(category => (
+                                        <DropdownMenuItem key={category.id} onClick={() => dispatch(setCategory(category.id))}>
+                                            {category.name}
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                            <SearchBar />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
