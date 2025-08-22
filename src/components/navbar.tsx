@@ -21,7 +21,7 @@ export default function Navbar({ logoVariant }: NavbarProps) {
     return (
         <div className='px-8 py-16 w-full bg-white lg:bg-transparent max-h-16 flex flex-row justify-between items-center'>
             <Logo variant={logoVariant} />
-            <UserInfo username={user?.username} />
+            <UserInfo username={user?.username} logoVariant={logoVariant} />
         </div>
 
     )
