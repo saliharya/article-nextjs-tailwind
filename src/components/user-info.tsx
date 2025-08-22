@@ -1,11 +1,11 @@
 import React from 'react'
 
 interface UserInfoProps {
-    username: string
+    username?: string
 }
 
 export default function UserInfo({ username }: UserInfoProps) {
-    const initial = username.charAt(0).toUpperCase()
+    const initial = username?.charAt(0).toUpperCase()
 
     return (
         <div className="flex gap-2 items-center">

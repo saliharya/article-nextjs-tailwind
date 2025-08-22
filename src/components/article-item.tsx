@@ -10,8 +10,6 @@ interface ArticleItemProps {
 
 export default function ArticleItem({ article }: ArticleItemProps) {
 
-    console.log('article', article)
-
     return (
         <div className="bg-white overflow-hidden max-w-xl">
             <div className="w-full h-60 relative rounded-[12px] overflow-hidden">
@@ -28,11 +26,11 @@ export default function ArticleItem({ article }: ArticleItemProps) {
                     {format(new Date(article.createdAt), 'MMMM dd, yyyy')}
                 </p>
 
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">
                     {article.title}
                 </h2>
 
-                <p className="text-gray-600 mb-4">
+                <p className="text-slate-600 text-base mb-4">
                     {article.content.length > 150
                         ? article.content.slice(0, 150) + '...'
                         : article.content}

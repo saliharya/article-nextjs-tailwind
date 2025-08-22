@@ -52,14 +52,14 @@ export default function ArticleContent() {
                     Showing : {Math.min(page * limit, total)} of {total} articles
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-[60px]">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-[60px] lg:px-0 lg:py-0 pt-10 pb-14 px-5">
                     {items.map((article) => (
                         <ArticleItem key={article.id} article={article} />
                     ))}
                 </div>
 
                 {totalPages > 1 && (
-                    <Pagination className="mt-8">
+                    <Pagination>
                         <PaginationContent>
                             <PaginationItem>
                                 <PaginationPrevious
