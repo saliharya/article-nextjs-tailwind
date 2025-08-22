@@ -23,6 +23,8 @@ interface ArticleState {
     limit: number
     loading: boolean
     error: string | null
+    selectedCategory: string | null
+    searchTerm: string
 }
 
 const initialState: ArticleState = {
@@ -32,6 +34,8 @@ const initialState: ArticleState = {
     limit: 10,
     loading: false,
     error: null,
+    selectedCategory: null,
+    searchTerm: ""
 }
 
 const articleSlice = createSlice({
@@ -44,6 +48,14 @@ const articleSlice = createSlice({
         setLimit: (state, action: PayloadAction<number>) => {
             state.limit = action.payload
         },
+        setCategory: (state, action: PayloadAction<string | null>) => {
+            state.selectedCategory = action.payload
+            state.page = 1
+        },
+        setSearchTerm: (state, action: PayloadAction<string>) => {
+            state.searchTerm = action.payload
+            state.page = 1
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -69,5 +81,5 @@ const articleSlice = createSlice({
     },
 })
 
-export const { setPage, setLimit } = articleSlice.actions
+export const { setPage, setLimit, setCategory, setSearchTerm } = articleSlice.actions
 export default articleSlice.reducer

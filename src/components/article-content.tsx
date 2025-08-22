@@ -15,16 +15,22 @@ import {
 } from "@/components/ui/pagination"
 
 export default function ArticleContent() {
+
     const dispatch = useAppDispatch()
-    const { items, loading, error, page, limit, total } = useAppSelector(
+    const { items, loading, error, page, limit, total, selectedCategory, searchTerm } = useAppSelector(
         (state) => state.articleReducer
     )
 
     const totalPages = Math.ceil(total / limit)
 
     useEffect(() => {
-        dispatch(fetchArticles({ page, limit }))
-    }, [dispatch, page, limit])
+        dispatch(fetchArticles({
+            page,
+            limit,
+            category: selectedCategory || undefined,
+            title: searchTerm || undefined
+        }))
+    }, [dispatch, page, limit, selectedCategory, searchTerm])
 
     if (loading) return <div>Loading...</div>
     if (error) return <div>{error}</div>

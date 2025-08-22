@@ -1,12 +1,34 @@
+'use client'
+
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import heroImage from '../../public/images/hero.jpg'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
 import { ChevronDown } from 'lucide-react'
 import SearchBar from './ui/search-bar'
 import Navbar from './navbar'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { setCategory } from '@/store/slices/articleSlice'
 
 export default function HeroSection() {
+
+    const dispatch = useAppDispatch()
+    const { searchTerm, selectedCategory, items: articles } = useAppSelector(state => state.articleReducer)
+
+    const [isMounted, setIsMounted] = useState(false)
+    useEffect(() => { setIsMounted(true) }, [])
+
+    const categories = useMemo(() => {
+        if (!articles) return []
+        const map = new Map()
+        for (const a of articles) {
+            if (a.category?.id) map.set(a.category.id, a.category)
+        }
+        return Array.from(map.values())
+    }, [articles])
+
+    if (!isMounted) return null
+
     return (
         <div className="relative w-full h-[560px] lg:h-[500px]">
             <Image src={heroImage} alt="hero" fill className="object-cover" />
@@ -31,13 +53,15 @@ export default function HeroSection() {
                         <div className="bg-blue-500 flex flex-col lg:flex-row p-1 rounded-md w-full max-w-[608px] mx-auto gap-2">
                             <DropdownMenu>
                                 <DropdownMenuTrigger className="flex items-center justify-between w-full bg-white rounded-md px-3 py-2 text-sm text-left shadow-sm focus:outline-none lg:w-[344px]">
-                                    {"Select category"}
+                                    {selectedCategory ? categories.find(c => c.id === selectedCategory)?.name : "Select category"}
                                     <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-full">
-                                    <DropdownMenuItem>Category 1</DropdownMenuItem>
-                                    <DropdownMenuItem>Category 2</DropdownMenuItem>
-                                    <DropdownMenuItem>Category 3</DropdownMenuItem>
+                                <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)]">
+                                    {categories.map(category => (
+                                        <DropdownMenuItem key={category.id} onClick={() => dispatch(setCategory(category.id))}>
+                                            {category.name}
+                                        </DropdownMenuItem>
+                                    ))}
                                 </DropdownMenuContent>
                             </DropdownMenu>
                             <SearchBar />
