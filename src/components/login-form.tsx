@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { useState } from "react"
 import { fetchProfile, loginUser } from "@/store/slices/authSlice"
 import { useRouter } from "next/navigation"
+import Logo from "./logo"
 
 export function LoginForm({
     className,
@@ -41,20 +42,9 @@ export function LoginForm({
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
                 <CardContent>
-                    <a
-                        href="#"
-                        className="flex items-center gap-2 self-center justify-center font-medium mb-8"
-                    >
-                        <div className="text-primary-foreground flex w-6 h-6 items-center justify-center rounded-md">
-                            <Image
-                                src="/icons/Logo.svg"
-                                alt="Logo"
-                                width={20.18}
-                                height={22.33}
-                            />
-                        </div>
-                        Logoipsum
-                    </a>
+                    <div className="flex self-center justify-center mb-8">
+                        <Logo />
+                    </div>
                     <form onSubmit={handleSubmit}>
                         <div className="grid gap-6">
                             <div className="grid gap-6">
