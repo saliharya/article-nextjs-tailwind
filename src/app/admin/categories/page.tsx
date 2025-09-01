@@ -14,8 +14,6 @@ import CategoryFormModal from "@/components/category-form-modal"
 export default function CategoriesPage() {
     const dispatch = useAppDispatch()
 
-    const { article } = useAppSelector((state) => state.articleReducer.detail)
-
     const { showCreate, formMode, categoryId, showDeleteModal } = useAppSelector(
         (state) => state.categoryReducer.list
     );
@@ -33,8 +31,8 @@ export default function CategoriesPage() {
     }
 
     const handleUpdate = (data: any) => {
-        if (!article?.id) return
-        dispatch(updateCategoryThunk({ id: article.id, ...data }))
+        if (!categoryId) return
+        dispatch(updateCategoryThunk({ id: categoryId, ...data }))
             .unwrap()
             .then(() => {
                 dispatch(closeForm())
