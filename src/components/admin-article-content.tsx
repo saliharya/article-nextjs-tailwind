@@ -1,9 +1,13 @@
-'use client'
+import React, { useEffect, useMemo } from 'react'
 
-import React, { useEffect } from "react"
-import ArticleItem from "./article-item"
-import { useAppDispatch, useAppSelector } from "@/store/hooks"
-import { fetchArticles, setPage } from "@/store/slices/articleSlice"
+import { Card, CardHeader } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import SearchBar from '@/components/search-bar'
+import { Plus } from 'lucide-react'
+import { setCategory, setFormMode, setPage, setShowCreate } from '@/store/slices/articleSlice'
+import { Button } from '@/components/ui/button'
+import { CategoryDropdown } from '@/components/category-dropdown'
+import { ArticleTable } from '@/components/article-table'
 import {
     Pagination,
     PaginationContent,
@@ -13,35 +17,25 @@ import {
     PaginationNext,
     PaginationEllipsis,
 } from "@/components/ui/pagination"
-import { useRouter } from "next/navigation"
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { fetchArticles } from '@/store/slices/articleSlice'
 
-interface ArticleContentProps {
-    isDetailPage?: boolean
-    currentId?: string
-}
-
-export default function ArticleContent({ isDetailPage = false, currentId }: ArticleContentProps) {
+export default function AdminArticleContent() {
 
     const dispatch = useAppDispatch()
-    const router = useRouter();
-    const { items, loading, error, page, limit, total, selectedCategory, searchTerm } = useAppSelector(
-        state => state.articleReducer.list
-    )
+    const { selectedCategory, items: articles, page, limit, total, searchTerm } =
+        useAppSelector((state) => state.articleReducer.list)
 
+    const categories = useMemo(() => {
+        if (!articles) return []
+        const map = new Map()
+        for (const a of articles) {
+            if (a.category?.id) map.set(a.category.id, a.category)
+        }
+        return Array.from(map.values())
+    }, [articles])
 
     const totalPages = Math.ceil(total / limit)
-
-    useEffect(() => {
-        dispatch(fetchArticles({
-            page,
-            limit,
-            category: selectedCategory || undefined,
-            title: searchTerm || undefined
-        }))
-    }, [dispatch, page, limit, selectedCategory, searchTerm])
-
-    if (loading) return <div>Loading...</div>
-    if (error) return <div>{error}</div>
 
     const getPageNumbers = () => {
         const pages: (number | "ellipsis")[] = []
@@ -59,34 +53,44 @@ export default function ArticleContent({ isDetailPage = false, currentId }: Arti
         return pages
     }
 
-    const handleClick = (id: string) => {
-        router.push(`/articles/${id}`);
-    }
-
-    const displayedArticles = isDetailPage
-        ? items
-            .filter(a => a.id !== currentId)
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 3)
-        : items
+    useEffect(() => {
+        dispatch(
+            fetchArticles({
+                page,
+                limit,
+                category: selectedCategory || undefined,
+                title: searchTerm || undefined,
+            })
+        )
+    }, [dispatch, page, limit, selectedCategory, searchTerm])
 
     return (
-        <div className="w-full min-h-screen flex justify-center">
-            <div className="w-[1240px] pt-4 flex flex-col gap-5">
-                <div className="font-medium text-base text-slate-600">
-                    Showing : {Math.min(page * limit, total)} of {total} articles
-                </div>
+        <div className="p-6">
+            <Card className="w-full h-full">
+                <CardHeader className="font-medium text-base">
+                    Total Articles : {articles?.length ?? 0}
+                </CardHeader>
+                <Separator />
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:px-0 lg:py-0 pt-10 pb-14 px-5">
-                    {displayedArticles.map((article) => (
-                        <ArticleItem
-                            key={article.id}
-                            article={article}
-                            onClick={() => handleClick(article.id)}
+                <div className="flex flex-row px-6 justify-between">
+                    <div className="flex flex-row gap-2">
+                        <CategoryDropdown
+                            categories={categories}
+                            selectedCategory={selectedCategory}
+                            onSelect={(id) => dispatch(setCategory(id))}
                         />
-                    ))}
+                        <SearchBar placeholder="Search by title" />
+                    </div>
+                    <Button onClick={() => {
+                        dispatch(setShowCreate(true))
+                        dispatch(setFormMode("create"))
+                    }}>
+                        <Plus className="size-4" />
+                        Add Articles
+                    </Button>
                 </div>
 
+                <ArticleTable articles={articles} />
                 <Pagination className="mb-14">
                     <PaginationContent>
                         <PaginationItem>
@@ -121,7 +125,7 @@ export default function ArticleContent({ isDetailPage = false, currentId }: Arti
                         </PaginationItem>
                     </PaginationContent>
                 </Pagination>
-            </div>
+            </Card>
         </div>
     )
 }

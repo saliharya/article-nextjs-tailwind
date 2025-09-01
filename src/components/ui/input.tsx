@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { Eye, EyeOff } from "lucide-react"; // atau icon lain favoritmu
+import { Eye, EyeOff } from "lucide-react";
 
 interface InputProps extends React.ComponentProps<"input"> { }
 

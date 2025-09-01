@@ -6,13 +6,7 @@ import { RegisterResponse } from "@/api/auth/response/registerResponse";
 import { UserProfileResponse } from "@/api/auth/response/userProfileResponse";
 import { apiClient } from "@/api/client";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-
-interface AuthState {
-    user: UserProfileResponse | null;
-    token: string | null;
-    loading: boolean;
-    error: string | null;
-}
+import { AuthState } from "../../states/auth/authState";
 
 const initialState: AuthState = {
     user: typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null,

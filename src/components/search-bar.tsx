@@ -6,7 +6,11 @@ import { Input } from './ui/input'
 import { useAppDispatch } from '@/store/hooks';
 import { setSearchTerm } from '@/store/slices/articleSlice';
 
-export default function SearchBar() {
+interface SearchBarProps {
+    placeholder: string;
+}
+
+export default function SearchBar({ placeholder }: SearchBarProps) {
 
     const dispatch = useAppDispatch();
     const [query, setQuery] = useState("");
@@ -26,7 +30,7 @@ export default function SearchBar() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search articles"
+                placeholder={placeholder || "Search articles"}
                 className="pl-8"
             />
         </div>

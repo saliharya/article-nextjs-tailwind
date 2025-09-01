@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://test-fe.mysellerpintar.com/api/:path*", // proxy ke backend
+        destination: "https://test-fe.mysellerpintar.com/api/:path*",
       },
     ];
   },

@@ -1,8 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit"
 import { getArticlesParams } from "@/api/article/request/getArticlesParams"
-import { getArticleDetail, getArticles } from "@/api/article/ArticleApi"
+import { deleteArticle, getArticleDetail, getArticles } from "@/api/article/ArticleApi"
 import { ArticleDetailResponse } from "@/api/article/response/articleResponse"
 import { ArticleResponse } from "@/api/article/response/articleListResponse"
+import { ArticleSliceState } from "../../states/articles/articleSliceState"
+import {
+    createArticle as createArticleApi,
+    updateArticle as updateArticleApi,
+} from "@/api/article/ArticleApi"
 
 export const fetchArticles = createAsyncThunk<
     ArticleResponse,
@@ -30,27 +35,44 @@ export const fetchArticleById = createAsyncThunk<
     }
 })
 
-interface ArticleListState {
-    items: ArticleResponse["data"]
-    total: number
-    page: number
-    limit: number
-    loading: boolean
-    error: string | null
-    selectedCategory: string | null
-    searchTerm: string
-}
+export const createArticleThunk = createAsyncThunk<
+    ArticleDetailResponse,
+    { title: string; content: string; categoryId: string },
+    { rejectValue: string }
+>("articles/createArticle", async (data, { rejectWithValue }) => {
+    try {
+        const newArticle = await createArticleApi(data)
+        return newArticle
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data || "Failed to create article")
+    }
+})
 
-interface ArticleDetailState {
-    article?: ArticleDetailResponse
-    loading: boolean
-    error: string | null
-}
+export const updateArticleThunk = createAsyncThunk<
+    ArticleDetailResponse,
+    { id: string; title: string; content: string; categoryId: string },
+    { rejectValue: string }
+>("articles/updateArticle", async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+        const updated = await updateArticleApi(id, data)
+        return updated
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data || "Failed to update article")
+    }
+})
 
-interface ArticleSliceState {
-    list: ArticleListState
-    detail: ArticleDetailState
-}
+export const deleteArticleThunk = createAsyncThunk<
+    string,
+    string,
+    { rejectValue: string }
+>("articles/deleteArticle", async (id, { rejectWithValue }) => {
+    try {
+        await deleteArticle(id)
+        return id
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data || "Failed to delete article")
+    }
+})
 
 const initialState: ArticleSliceState = {
     list: {
@@ -61,7 +83,11 @@ const initialState: ArticleSliceState = {
         loading: false,
         error: null,
         selectedCategory: null,
-        searchTerm: ""
+        searchTerm: "",
+        showCreate: false,
+        formMode: null,
+        showDeleteModal: false,
+        deletingArticleId: null,
     },
     detail: {
         article: undefined,
@@ -92,6 +118,25 @@ const articleSlice = createSlice({
             state.detail.article = undefined
             state.detail.error = null
             state.detail.loading = false
+        },
+        setShowCreate: (state, action: PayloadAction<boolean>) => {
+            state.list.showCreate = action.payload
+        },
+        setFormMode: (state, action: PayloadAction<"create" | "edit" | null>) => {
+            state.list.formMode = action.payload
+        },
+        closeForm: (state) => {
+            state.list.showCreate = false
+            state.list.formMode = null
+            state.detail.article = undefined
+        },
+        openDeleteModal: (state, action: PayloadAction<string>) => {
+            state.list.showDeleteModal = true
+            state.list.deletingArticleId = action.payload
+        },
+        closeDeleteModal: (state) => {
+            state.list.showDeleteModal = false
+            state.list.deletingArticleId = null
         }
     },
     extraReducers: (builder) => {
@@ -125,8 +170,37 @@ const articleSlice = createSlice({
                 state.detail.loading = false
                 state.detail.error = action.payload || "Failed to fetch article detail"
             })
+
+        builder
+            .addCase(deleteArticleThunk.pending, (state) => {
+                state.list.loading = true
+                state.list.error = null
+            })
+            .addCase(deleteArticleThunk.fulfilled, (state, action: PayloadAction<string>) => {
+                state.list.loading = false
+                state.list.items = state.list.items.filter(item => item.id !== action.payload)
+                state.list.total = state.list.total > 0 ? state.list.total - 1 : 0
+                if (state.detail.article?.id === action.payload) {
+                    state.detail.article = undefined
+                }
+            })
+            .addCase(deleteArticleThunk.rejected, (state, action) => {
+                state.list.loading = false
+                state.list.error = action.payload || "Failed to delete article"
+            })
     }
 })
 
-export const { setPage, setLimit, setCategory, setSearchTerm, clearSelectedArticle } = articleSlice.actions
+export const {
+    setPage,
+    setLimit,
+    setCategory,
+    setSearchTerm,
+    clearSelectedArticle,
+    setShowCreate,
+    setFormMode,
+    closeForm,
+    openDeleteModal,
+    closeDeleteModal
+} = articleSlice.actions
 export default articleSlice.reducer
