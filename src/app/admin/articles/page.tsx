@@ -1,5 +1,4 @@
 'use client'
-import React, { useEffect, useMemo } from 'react'
 
 import { AppSidebar } from "@/components/app-sidebar"
 import {
@@ -7,8 +6,13 @@ import {
     SidebarProvider,
 } from "@/components/ui/sidebar"
 import AdminArticleContent from '@/components/admin-article-content'
+import CreateArticle from "@/components/create-article"
+import { useAppSelector } from "@/store/hooks"
 
 export default function ArticlePage() {
+
+    const showCreate = useAppSelector((state) => state.articleReducer.list.showCreate)
+
     return (
         <SidebarProvider defaultOpen={true}>
             <AppSidebar />
@@ -18,7 +22,12 @@ export default function ArticlePage() {
                         Articles
                     </span>
                 </div>
-                <AdminArticleContent />
+                {!showCreate && (
+                    <AdminArticleContent />
+                )}
+                {showCreate && (
+                    <CreateArticle />
+                )}
             </SidebarInset>
         </SidebarProvider>
     )

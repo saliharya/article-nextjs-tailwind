@@ -40,7 +40,8 @@ const initialState: ArticleSliceState = {
         loading: false,
         error: null,
         selectedCategory: null,
-        searchTerm: ""
+        searchTerm: "",
+        showCreate: false
     },
     detail: {
         article: undefined,
@@ -71,6 +72,9 @@ const articleSlice = createSlice({
             state.detail.article = undefined
             state.detail.error = null
             state.detail.loading = false
+        },
+        setShowCreate: (state, action: PayloadAction<boolean>) => {
+            state.list.showCreate = action.payload
         }
     },
     extraReducers: (builder) => {
@@ -107,5 +111,5 @@ const articleSlice = createSlice({
     }
 })
 
-export const { setPage, setLimit, setCategory, setSearchTerm, clearSelectedArticle } = articleSlice.actions
+export const { setPage, setLimit, setCategory, setSearchTerm, clearSelectedArticle, setShowCreate } = articleSlice.actions
 export default articleSlice.reducer

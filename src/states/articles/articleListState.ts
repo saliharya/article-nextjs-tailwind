@@ -9,4 +9,5 @@ export interface ArticleListState {
     error: string | null
     selectedCategory: string | null
     searchTerm: string
+    showCreate: boolean
 }
