@@ -58,7 +58,7 @@ export default function ArticlePage() {
                         </CardHeader>
                         <Separator />
 
-                        <div className="flex flex-row px-8 justify-between">
+                        <div className="flex flex-row px-6 justify-between">
                             <div className="flex flex-row gap-2">
                                 <CategoryDropdown
                                     categories={categories}
