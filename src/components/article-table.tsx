@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table"
 import { ArticleActions } from "./article-actions"
 import noImage from '../../public/images/no-image.png'
-import { openDeleteModal } from "@/store/slices/articleSlice"
+import { fetchArticleById, openDeleteModal, setFormMode, setShowCreate } from "@/store/slices/articleSlice"
 import { useAppDispatch } from "@/store/hooks"
 import { format } from "date-fns"
 
@@ -57,7 +57,11 @@ export function ArticleTable({ articles }: { articles: any[] }) {
                         <TableCell className="text-center text-slate-600 text-sm w-1/5">
                             <ArticleActions
                                 onPreview={() => console.log("Preview", article.id)}
-                                onEdit={() => console.log("Edit", article.id)}
+                                onEdit={() => {
+                                    dispatch(setShowCreate(true))
+                                    dispatch(setFormMode("edit"))
+                                    dispatch(fetchArticleById(article.id))
+                                }}
                                 onDelete={() => dispatch(openDeleteModal(article.id))}
                             />
                         </TableCell>

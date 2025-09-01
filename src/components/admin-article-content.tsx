@@ -4,7 +4,7 @@ import { Card, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import SearchBar from '@/components/search-bar'
 import { Plus } from 'lucide-react'
-import { setCategory, setPage, setShowCreate } from '@/store/slices/articleSlice'
+import { setCategory, setFormMode, setPage, setShowCreate } from '@/store/slices/articleSlice'
 import { Button } from '@/components/ui/button'
 import { CategoryDropdown } from '@/components/category-dropdown'
 import { ArticleTable } from '@/components/article-table'
@@ -81,7 +81,10 @@ export default function AdminArticleContent() {
                         />
                         <SearchBar placeholder="Search by title" />
                     </div>
-                    <Button onClick={() => dispatch(setShowCreate(true))}>
+                    <Button onClick={() => {
+                        dispatch(setShowCreate(true))
+                        dispatch(setFormMode("create"))
+                    }}>
                         <Plus className="size-4" />
                         Add Articles
                     </Button>
