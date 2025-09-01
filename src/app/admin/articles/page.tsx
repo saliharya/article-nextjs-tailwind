@@ -6,12 +6,33 @@ import {
     SidebarProvider,
 } from "@/components/ui/sidebar"
 import AdminArticleContent from '@/components/admin-article-content'
-import CreateArticle from "@/components/create-article"
-import { useAppSelector } from "@/store/hooks"
+import { useAppDispatch, useAppSelector } from "@/store/hooks"
+import { ArticleForm } from "@/components/article-form"
+import { closeForm, createArticleThunk, updateArticleThunk } from "@/store/slices/articleSlice"
 
 export default function ArticlePage() {
+    const dispatch = useAppDispatch()
+    const { showCreate, formMode } = useAppSelector(
+        (state) => state.articleReducer.list
+    )
+    const { article } = useAppSelector((state) => state.articleReducer.detail)
 
-    const showCreate = useAppSelector((state) => state.articleReducer.list.showCreate)
+    const handleCreate = (data: any) => {
+        dispatch(createArticleThunk(data))
+            .unwrap()
+            .then(() => {
+                dispatch(closeForm())
+            })
+    }
+
+    const handleUpdate = (data: any) => {
+        if (!article?.id) return
+        dispatch(updateArticleThunk({ id: article.id, ...data }))
+            .unwrap()
+            .then(() => {
+                dispatch(closeForm())
+            })
+    }
 
     return (
         <SidebarProvider defaultOpen={true}>
@@ -26,7 +47,11 @@ export default function ArticlePage() {
                     <AdminArticleContent />
                 )}
                 {showCreate && (
-                    <CreateArticle />
+                    <ArticleForm
+                        mode={formMode || "create"}
+                        initialData={formMode === "edit" ? article : undefined}
+                        onSubmit={formMode === "edit" ? handleUpdate : handleCreate}
+                    />
                 )}
             </SidebarInset>
         </SidebarProvider>

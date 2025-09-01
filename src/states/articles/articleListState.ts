@@ -10,4 +10,5 @@ export interface ArticleListState {
     selectedCategory: string | null
     searchTerm: string
     showCreate: boolean
+    formMode: 'create' | 'edit' | null
 }

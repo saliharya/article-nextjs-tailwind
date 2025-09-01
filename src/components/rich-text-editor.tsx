@@ -1,14 +1,19 @@
 "use client"
 
-import { useEditor, EditorContent, Editor } from "@tiptap/react"
+import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import TextAlign from "@tiptap/extension-text-align"
 import Image from "@tiptap/extension-image"
 import Placeholder from "@tiptap/extension-placeholder"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { RichTextToolbar } from "./richtext-toolbar"
 
-export default function RichTextEditor() {
+interface RichTextEditorProps {
+    content?: string
+    onChange?: (value: string) => void
+}
+
+export default function RichTextEditor({ content = "", onChange }: RichTextEditorProps) {
     const [wordCount, setWordCount] = useState(0)
 
     const editor = useEditor({
@@ -18,7 +23,7 @@ export default function RichTextEditor() {
             TextAlign.configure({ types: ["heading", "paragraph"] }),
             Placeholder.configure({ placeholder: "Type a content..." }),
         ],
-        content: "",
+        content,
         immediatelyRender: false,
         onUpdate: ({ editor }) => {
             const text = editor.state.doc.textBetween(
@@ -26,9 +31,21 @@ export default function RichTextEditor() {
                 editor.state.doc.content.size,
                 " "
             )
-            setWordCount(text.trim().split(/\s+/).filter(Boolean).length)
+
+            const words = text.trim().split(/\s+/).filter(Boolean).length
+            setWordCount(words)
+
+            if (onChange) {
+                onChange(editor.getHTML())
+            }
         },
     })
+
+    useEffect(() => {
+        if (editor && content !== editor.getHTML()) {
+            editor.commands.setContent(content)
+        }
+    }, [content, editor])
 
     if (!editor) return null
 

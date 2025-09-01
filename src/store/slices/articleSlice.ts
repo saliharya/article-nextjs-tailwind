@@ -4,6 +4,10 @@ import { getArticleDetail, getArticles } from "@/api/article/ArticleApi"
 import { ArticleDetailResponse } from "@/api/article/response/articleResponse"
 import { ArticleResponse } from "@/api/article/response/articleListResponse"
 import { ArticleSliceState } from "../../states/articles/articleSliceState"
+import {
+    createArticle as createArticleApi,
+    updateArticle as updateArticleApi,
+} from "@/api/article/ArticleApi"
 
 export const fetchArticles = createAsyncThunk<
     ArticleResponse,
@@ -31,6 +35,32 @@ export const fetchArticleById = createAsyncThunk<
     }
 })
 
+export const createArticleThunk = createAsyncThunk<
+    ArticleDetailResponse,
+    { title: string; content: string; categoryId: string },
+    { rejectValue: string }
+>("articles/createArticle", async (data, { rejectWithValue }) => {
+    try {
+        const newArticle = await createArticleApi(data)
+        return newArticle
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data || "Failed to create article")
+    }
+})
+
+export const updateArticleThunk = createAsyncThunk<
+    ArticleDetailResponse,
+    { id: string; title: string; content: string; categoryId: string },
+    { rejectValue: string }
+>("articles/updateArticle", async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+        const updated = await updateArticleApi(id, data)
+        return updated
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data || "Failed to update article")
+    }
+})
+
 const initialState: ArticleSliceState = {
     list: {
         items: [],
@@ -41,7 +71,8 @@ const initialState: ArticleSliceState = {
         error: null,
         selectedCategory: null,
         searchTerm: "",
-        showCreate: false
+        showCreate: false,
+        formMode: null,
     },
     detail: {
         article: undefined,
@@ -75,7 +106,15 @@ const articleSlice = createSlice({
         },
         setShowCreate: (state, action: PayloadAction<boolean>) => {
             state.list.showCreate = action.payload
-        }
+        },
+        setFormMode: (state, action: PayloadAction<"create" | "edit" | null>) => {
+            state.list.formMode = action.payload
+        },
+        closeForm: (state) => {
+            state.list.showCreate = false
+            state.list.formMode = null
+            state.detail.article = undefined
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -111,5 +150,14 @@ const articleSlice = createSlice({
     }
 })
 
-export const { setPage, setLimit, setCategory, setSearchTerm, clearSelectedArticle, setShowCreate } = articleSlice.actions
+export const {
+    setPage,
+    setLimit,
+    setCategory,
+    setSearchTerm,
+    clearSelectedArticle,
+    setShowCreate,
+    setFormMode,
+    closeForm,
+} = articleSlice.actions
 export default articleSlice.reducer

@@ -5,6 +5,13 @@ import { ArticleResponse } from "./response/articleListResponse"
 import { ArticleDetailResponse } from "./response/articleResponse"
 import { CategoryResponse } from "./response/categoryResponse"
 
+export const createArticle = async (
+    data: { title: string; content: string; categoryId: string }
+): Promise<ArticleDetailResponse> => {
+    const response = await apiClient.post<ArticleDetailResponse>("/articles", data)
+    return response.data
+}
+
 export const getArticles = async (
     params?: getArticlesParams): Promise<ArticleResponse> => {
     const response = await apiClient.get<ArticleResponse>("/articles", {
