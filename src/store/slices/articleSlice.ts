@@ -3,6 +3,7 @@ import { getArticlesParams } from "@/api/article/request/getArticlesParams"
 import { getArticleDetail, getArticles } from "@/api/article/ArticleApi"
 import { ArticleDetailResponse } from "@/api/article/response/articleResponse"
 import { ArticleResponse } from "@/api/article/response/articleListResponse"
+import { ArticleSliceState } from "../../states/articles/articleSliceState"
 
 export const fetchArticles = createAsyncThunk<
     ArticleResponse,
@@ -29,28 +30,6 @@ export const fetchArticleById = createAsyncThunk<
         return rejectWithValue(error.response?.data || "Article not found")
     }
 })
-
-interface ArticleListState {
-    items: ArticleResponse["data"]
-    total: number
-    page: number
-    limit: number
-    loading: boolean
-    error: string | null
-    selectedCategory: string | null
-    searchTerm: string
-}
-
-interface ArticleDetailState {
-    article?: ArticleDetailResponse
-    loading: boolean
-    error: string | null
-}
-
-interface ArticleSliceState {
-    list: ArticleListState
-    detail: ArticleDetailState
-}
 
 const initialState: ArticleSliceState = {
     list: {
