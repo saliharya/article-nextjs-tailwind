@@ -8,11 +8,12 @@ import {
 import AdminArticleContent from '@/components/admin-article-content'
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { ArticleForm } from "@/components/article-form"
-import { closeForm, createArticleThunk, updateArticleThunk } from "@/store/slices/articleSlice"
+import { closeForm, createArticleThunk, deleteArticleThunk, updateArticleThunk, closeDeleteModal } from "@/store/slices/articleSlice"
+import { DeleteModal } from "@/components/delete-modal"
 
 export default function ArticlePage() {
     const dispatch = useAppDispatch()
-    const { showCreate, formMode } = useAppSelector(
+    const { showCreate, formMode, showDeleteModal, deletingArticleId } = useAppSelector(
         (state) => state.articleReducer.list
     )
     const { article } = useAppSelector((state) => state.articleReducer.detail)
@@ -34,6 +35,12 @@ export default function ArticlePage() {
             })
     }
 
+    const handleDelete = async () => {
+        if (!deletingArticleId) return
+        await dispatch(deleteArticleThunk(deletingArticleId)).unwrap()
+        dispatch(closeDeleteModal())
+    }
+
     return (
         <SidebarProvider defaultOpen={true}>
             <AppSidebar />
@@ -51,6 +58,13 @@ export default function ArticlePage() {
                         mode={formMode || "create"}
                         initialData={formMode === "edit" ? article : undefined}
                         onSubmit={formMode === "edit" ? handleUpdate : handleCreate}
+                    />
+                )}
+
+                {showDeleteModal && (
+                    <DeleteModal
+                        onCancel={() => dispatch(closeDeleteModal())}
+                        onDelete={handleDelete}
                     />
                 )}
             </SidebarInset>

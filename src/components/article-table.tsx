@@ -8,8 +8,13 @@ import {
 } from "@/components/ui/table"
 import { ArticleActions } from "./article-actions"
 import noImage from '../../public/images/no-image.png'
+import { openDeleteModal } from "@/store/slices/articleSlice"
+import { useAppDispatch } from "@/store/hooks"
 
 export function ArticleTable({ articles }: { articles: any[] }) {
+
+    const dispatch = useAppDispatch()
+
     if (!articles?.length) {
         return (
             <div className="text-center text-slate-500 py-6">
@@ -52,7 +57,7 @@ export function ArticleTable({ articles }: { articles: any[] }) {
                             <ArticleActions
                                 onPreview={() => console.log("Preview", article.id)}
                                 onEdit={() => console.log("Edit", article.id)}
-                                onDelete={() => console.log("Delete", article.id)}
+                                onDelete={() => dispatch(openDeleteModal(article.id))}
                             />
                         </TableCell>
                     </TableRow>

@@ -10,5 +10,7 @@ export interface ArticleListState {
     selectedCategory: string | null
     searchTerm: string
     showCreate: boolean
+    showDeleteModal: boolean
+    deletingArticleId: string | null
     formMode: 'create' | 'edit' | null
 }
