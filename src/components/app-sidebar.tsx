@@ -1,6 +1,6 @@
 import * as React from "react"
+import { FileText, LogOut, Tag } from "lucide-react"
 
-import { SearchForm } from "@/components/search-form"
 import { VersionSwitcher } from "@/components/version-switcher"
 import {
   Sidebar,
@@ -22,14 +22,20 @@ const data = {
         {
           title: "Articles",
           url: "#",
+          icon: FileText,
+          isActive: true,
         },
         {
           title: "Categories",
           url: "#",
+          icon: Tag,
+          isActive: false,
         },
         {
           title: "Logout",
           url: "#",
+          icon: LogOut,
+          isActive: false,
         },
       ],
     },
@@ -51,13 +57,32 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarGroupContent>
               <div className="px-8">
                 <SidebarMenu>
-                  {item.items.map((subItem) => (
-                    <SidebarMenuItem key={subItem.title}>
-                      <SidebarMenuButton asChild isActive={subItem.isActive}>
-                        <a href={subItem.url}>{subItem.title}</a>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
+                  {item.items.map((subItem) => {
+                    const isLogout = subItem.title === "Logout"
+                    return (
+                      <SidebarMenuItem key={subItem.title}>
+                        <SidebarMenuButton asChild>
+                          <a
+                            href={subItem.url}
+                            className={`flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors text-white
+                              ${subItem.isActive
+                                ? "bg-blue-500 text-white hover:bg-blue-600"
+                                : "text-gray-700 hover:bg-gray-100"
+                              }`}
+                          >
+                            <subItem.icon
+                              className={`h-4 w-4 text-white
+                                ${subItem.isActive
+                                  ? "text-white"
+                                  : "text-gray-500"
+                                }`}
+                            />
+                            {subItem.title}
+                          </a>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )
+                  })}
                 </SidebarMenu>
               </div>
             </SidebarGroupContent>
