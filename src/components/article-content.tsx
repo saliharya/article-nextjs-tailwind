@@ -87,42 +87,40 @@ export default function ArticleContent({ isDetailPage = false, currentId }: Arti
                     ))}
                 </div>
 
-                {((totalPages > 1) && !isDetailPage) && (
-                    <Pagination className="mb-14">
-                        <PaginationContent>
-                            <PaginationItem>
-                                <PaginationPrevious
-                                    onClick={() => page > 1 && dispatch(setPage(page - 1))}
-                                    className={page === 1 ? "pointer-events-none opacity-50" : ""}
-                                />
-                            </PaginationItem>
+                <Pagination className="mb-14">
+                    <PaginationContent>
+                        <PaginationItem>
+                            <PaginationPrevious
+                                onClick={() => page > 1 && dispatch(setPage(page - 1))}
+                                className={page === 1 ? "pointer-events-none opacity-50" : ""}
+                            />
+                        </PaginationItem>
 
-                            {getPageNumbers().map((p, idx) =>
-                                p === "ellipsis" ? (
-                                    <PaginationItem key={`ellipsis-${idx}`}>
-                                        <PaginationEllipsis />
-                                    </PaginationItem>
-                                ) : (
-                                    <PaginationItem key={p}>
-                                        <PaginationLink
-                                            isActive={page === p}
-                                            onClick={() => dispatch(setPage(p))}
-                                        >
-                                            {p}
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                )
-                            )}
+                        {getPageNumbers().map((p, idx) =>
+                            p === "ellipsis" ? (
+                                <PaginationItem key={`ellipsis-${idx}`}>
+                                    <PaginationEllipsis />
+                                </PaginationItem>
+                            ) : (
+                                <PaginationItem key={p}>
+                                    <PaginationLink
+                                        isActive={page === p}
+                                        onClick={() => dispatch(setPage(p))}
+                                    >
+                                        {p}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            )
+                        )}
 
-                            <PaginationItem>
-                                <PaginationNext
-                                    onClick={() => page < totalPages && dispatch(setPage(page + 1))}
-                                    className={page === totalPages ? "pointer-events-none opacity-50" : ""}
-                                />
-                            </PaginationItem>
-                        </PaginationContent>
-                    </Pagination>
-                )}
+                        <PaginationItem>
+                            <PaginationNext
+                                onClick={() => page < totalPages && dispatch(setPage(page + 1))}
+                                className={page === totalPages ? "pointer-events-none opacity-50" : ""}
+                            />
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
             </div>
         </div>
     )

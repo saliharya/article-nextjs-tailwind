@@ -11,10 +11,19 @@ import { Separator } from '@/components/ui/separator'
 import SearchBar from '@/components/search-bar'
 import { Plus } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { fetchArticles, setCategory } from '@/store/slices/articleSlice'
+import { fetchArticles, setCategory, setPage } from '@/store/slices/articleSlice'
 import { Button } from '@/components/ui/button'
 import { CategoryDropdown } from '@/components/category-dropdown'
 import { ArticleTable } from '@/components/article-table'
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationPrevious,
+    PaginationNext,
+    PaginationEllipsis,
+} from "@/components/ui/pagination"
 
 export default function ArticlePage() {
     const dispatch = useAppDispatch()
@@ -40,6 +49,24 @@ export default function ArticlePage() {
             })
         )
     }, [dispatch, page, limit, selectedCategory, searchTerm])
+
+    const totalPages = Math.ceil(total / limit)
+
+    const getPageNumbers = () => {
+        const pages: (number | "ellipsis")[] = []
+        if (totalPages <= 5) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i)
+        } else {
+            if (page <= 3) {
+                pages.push(1, 2, 3, "ellipsis", totalPages)
+            } else if (page >= totalPages - 2) {
+                pages.push(1, "ellipsis", totalPages - 2, totalPages - 1, totalPages)
+            } else {
+                pages.push(1, "ellipsis", page - 1, page, page + 1, "ellipsis", totalPages)
+            }
+        }
+        return pages
+    }
 
     return (
         <SidebarProvider defaultOpen={true}>
@@ -74,6 +101,40 @@ export default function ArticlePage() {
                         </div>
 
                         <ArticleTable articles={articles} />
+                        <Pagination className="mb-14">
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious
+                                        onClick={() => page > 1 && dispatch(setPage(page - 1))}
+                                        className={page === 1 ? "pointer-events-none opacity-50" : ""}
+                                    />
+                                </PaginationItem>
+
+                                {getPageNumbers().map((p, idx) =>
+                                    p === "ellipsis" ? (
+                                        <PaginationItem key={`ellipsis-${idx}`}>
+                                            <PaginationEllipsis />
+                                        </PaginationItem>
+                                    ) : (
+                                        <PaginationItem key={p}>
+                                            <PaginationLink
+                                                isActive={page === p}
+                                                onClick={() => dispatch(setPage(p))}
+                                            >
+                                                {p}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    )
+                                )}
+
+                                <PaginationItem>
+                                    <PaginationNext
+                                        onClick={() => page < totalPages && dispatch(setPage(page + 1))}
+                                        className={page === totalPages ? "pointer-events-none opacity-50" : ""}
+                                    />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
                     </Card>
                 </div>
             </SidebarInset>
