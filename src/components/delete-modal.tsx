@@ -10,8 +10,8 @@ interface DeleteModalProps {
 export const DeleteModal: React.FC<DeleteModalProps> = ({
     onCancel,
     onDelete,
-    title = "Delete Articles",
-    description = "Deleting this article is permanent and cannot be undone. All related content will be removed.",
+    title,
+    description,
 }) => {
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">

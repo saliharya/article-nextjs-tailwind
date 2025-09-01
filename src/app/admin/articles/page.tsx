@@ -65,6 +65,8 @@ export default function ArticlePage() {
                     <DeleteModal
                         onCancel={() => dispatch(closeDeleteModal())}
                         onDelete={handleDelete}
+                        title="Delete Articles"
+                        description="Deleting this article is permanent and cannot be undone. All related content will be removed."
                     />
                 )}
             </SidebarInset>

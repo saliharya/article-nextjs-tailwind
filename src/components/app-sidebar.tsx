@@ -1,5 +1,6 @@
 import * as React from "react"
 import { FileText, LogOut, Tag } from "lucide-react"
+import { usePathname } from "next/navigation"
 
 import { VersionSwitcher } from "@/components/version-switcher"
 import {
@@ -21,21 +22,18 @@ const data = {
       items: [
         {
           title: "Articles",
-          url: "#",
+          url: "/admin/articles",
           icon: FileText,
-          isActive: true,
         },
         {
           title: "Categories",
-          url: "#",
+          url: "/admin/categories",
           icon: Tag,
-          isActive: false,
         },
         {
           title: "Logout",
-          url: "#",
+          url: "/logout",
           icon: LogOut,
-          isActive: false,
         },
       ],
     },
@@ -43,6 +41,8 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname()
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -58,23 +58,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <div className="px-2">
                 <SidebarMenu>
                   {item.items.map((subItem) => {
+                    const isActive = pathname === subItem.url
                     return (
                       <SidebarMenuItem key={subItem.title}>
                         <SidebarMenuButton asChild>
                           <a
                             href={subItem.url}
-                            className={`flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors text-white
-                              ${subItem.isActive
+                            className={`flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors
+                              ${isActive
                                 ? "bg-blue-500 text-white hover:bg-blue-600"
                                 : "text-gray-700 hover:bg-gray-100"
                               }`}
                           >
                             <subItem.icon
-                              className={`h-4 w-4 text-white
-                                ${subItem.isActive
-                                  ? "text-white"
-                                  : "text-gray-500"
-                                }`}
+                              className={`h-4 w-4
+                                ${isActive ? "text-white" : "text-gray-500"}`}
                             />
                             {subItem.title}
                           </a>
