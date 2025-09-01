@@ -55,10 +55,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {data.navMain.map((item, index) => (
           <SidebarGroup key={index}>
             <SidebarGroupContent>
-              <div className="px-8">
+              <div className="px-2">
                 <SidebarMenu>
                   {item.items.map((subItem) => {
-                    const isLogout = subItem.title === "Logout"
                     return (
                       <SidebarMenuItem key={subItem.title}>
                         <SidebarMenuButton asChild>
