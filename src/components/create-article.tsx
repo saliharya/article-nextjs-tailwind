@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { CategoryDropdown } from './category-dropdown'
+import RichTextEditor from './rich-text-editor'
 
 export default function CreateArticle() {
 
@@ -25,24 +26,6 @@ export default function CreateArticle() {
         }
         return Array.from(map.values())
     }, [articles])
-
-    const totalPages = Math.ceil(total / limit)
-
-    const getPageNumbers = () => {
-        const pages: (number | "ellipsis")[] = []
-        if (totalPages <= 5) {
-            for (let i = 1; i <= totalPages; i++) pages.push(i)
-        } else {
-            if (page <= 3) {
-                pages.push(1, 2, 3, "ellipsis", totalPages)
-            } else if (page >= totalPages - 2) {
-                pages.push(1, "ellipsis", totalPages - 2, totalPages - 1, totalPages)
-            } else {
-                pages.push(1, "ellipsis", page - 1, page, page + 1, "ellipsis", totalPages)
-            }
-        }
-        return pages
-    }
 
     useEffect(() => {
         dispatch(
@@ -72,7 +55,7 @@ export default function CreateArticle() {
                         <Label>Thumbnails</Label>
                         <label
                             htmlFor="file-upload"
-                            className="flex flex-col items-center justify-center border border-dashed rounded-md p-6 cursor-pointer hover:bg-gray-50"
+                            className="flex flex-col items-center justify-center border border-dashed rounded-md p-6 cursor-pointer hover:bg-gray-50 h-[187px] w-[223px]"
                         >
                             <Upload className="w-8 h-8 text-gray-500" />
                             <span className="text-sm text-gray-600 mt-2">
@@ -108,12 +91,8 @@ export default function CreateArticle() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label>Content</Label>
-                        <textarea
-                            className="w-full min-h-[200px] border rounded-md p-3 text-sm resize-none"
-                            placeholder="Type a content..."
-                        />
-                        <p className="text-xs text-gray-400">0 Words</p>
+                        <label className="text-sm font-medium">Content</label>
+                        <RichTextEditor />
                     </div>
                 </CardContent>
 
