@@ -7,6 +7,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { ArticleActions } from "./article-actions"
+import noImage from '../../public/images/no-image.png'
 
 export function ArticleTable({ articles }: { articles: any[] }) {
     if (!articles?.length) {
@@ -33,9 +34,9 @@ export function ArticleTable({ articles }: { articles: any[] }) {
                     <TableRow key={article.id}>
                         <TableCell className="text-center">
                             <img
-                                src={article.imageUrl || "/placeholder.png"}
+                                src={article.imageUrl ?? noImage.src}
                                 alt={article.title}
-                                className="w-16 h-12 rounded object-cover mx-auto"
+                                className="w-[60px] h-[60px] rounded-[6px] object-cover mx-auto"
                             />
                         </TableCell>
                         <TableCell className="text-center text-slate-600 text-sm">
