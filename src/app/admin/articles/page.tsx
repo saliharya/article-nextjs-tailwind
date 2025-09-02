@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { ArticleForm } from "@/components/article-form"
 import { closeForm, createArticleThunk, deleteArticleThunk, updateArticleThunk, closeDeleteModal } from "@/store/slices/articleSlice"
 import { DeleteModal } from "@/components/delete-modal"
+import { ArticleInput } from "@/models/article"
 
 export default function ArticlePage() {
     const dispatch = useAppDispatch()
@@ -18,7 +19,7 @@ export default function ArticlePage() {
     )
     const { article } = useAppSelector((state) => state.articleReducer.detail)
 
-    const handleCreate = (data: any) => {
+    const handleCreate = (data: ArticleInput) => {
         dispatch(createArticleThunk(data))
             .unwrap()
             .then(() => {
@@ -26,7 +27,7 @@ export default function ArticlePage() {
             })
     }
 
-    const handleUpdate = (data: any) => {
+    const handleUpdate = (data: ArticleInput) => {
         if (!article?.id) return
         dispatch(updateArticleThunk({ id: article.id, ...data }))
             .unwrap()
@@ -56,7 +57,14 @@ export default function ArticlePage() {
                 {showCreate && (
                     <ArticleForm
                         mode={formMode || "create"}
-                        initialData={formMode === "edit" ? article : undefined}
+                        initialData={
+                            formMode === "edit" && article
+                                ? {
+                                    ...article,
+                                    imageUrl: article.imageUrl ?? undefined,
+                                }
+                                : undefined
+                        }
                         onSubmit={formMode === "edit" ? handleUpdate : handleCreate}
                     />
                 )}

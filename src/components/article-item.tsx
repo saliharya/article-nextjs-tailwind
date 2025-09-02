@@ -6,7 +6,7 @@ import noImage from '../../public/images/no-image.png'
 
 interface ArticleItemProps {
     article: Article
-    onClick?: (article: any) => void
+    onClick?: (article: Article) => void
 }
 
 export default function ArticleItem({ article, onClick }: ArticleItemProps) {

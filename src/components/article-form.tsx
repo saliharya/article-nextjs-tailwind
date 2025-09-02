@@ -5,7 +5,6 @@ import { ArrowLeft, Upload } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import {
     setShowCreate,
-    setCategory,
     fetchArticles,
 } from "@/store/slices/articleSlice"
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
@@ -15,7 +14,6 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { CategoryDropdown } from "./category-dropdown"
 import RichTextEditor from "./rich-text-editor"
-import { createArticleThunk, updateArticleThunk } from "@/store/slices/articleSlice"
 import { uploadThumbnail } from "@/api/article/ArticleApi"
 
 interface ArticleFormProps {
@@ -25,12 +23,18 @@ interface ArticleFormProps {
         title?: string
         content?: string
         categoryId?: string
-        imageUrl?: string
+        imageUrl?: string | undefined
     }
+    onSubmit?: (data: {
+        title: string
+        content: string
+        categoryId: string
+        imageUrl?: string | undefined
+    }) => void
     onSuccess?: () => void
 }
 
-export function ArticleForm({ mode, initialData, onSuccess }: ArticleFormProps) {
+export function ArticleForm({ mode, initialData, onSubmit, onSuccess }: ArticleFormProps) {
     const dispatch = useAppDispatch()
     const { selectedCategory, items: articles, page, limit, searchTerm } =
         useAppSelector((state) => state.articleReducer.list)
@@ -70,8 +74,8 @@ export function ArticleForm({ mode, initialData, onSuccess }: ArticleFormProps) 
 
     const handleSubmit = async () => {
         if (!title || !content || !categoryId) {
-            alert("Please fill in all required fields")
-            return
+            alert("Please fill in all required fields");
+            return;
         }
 
         try {
@@ -81,17 +85,12 @@ export function ArticleForm({ mode, initialData, onSuccess }: ArticleFormProps) 
                 imageUrl = await uploadThumbnail(thumbnail);
             }
 
-            if (mode === "create") {
-                await dispatch(
-                    createArticleThunk({ title, content, categoryId, imageUrl })
-                ).unwrap()
-            } else if (mode === "edit" && initialData?.id) {
-                await dispatch(
-                    updateArticleThunk({ id: initialData.id, title, content, categoryId, imageUrl })
-                ).unwrap()
+            if (onSubmit) {
+                await onSubmit({ title, content, categoryId, imageUrl });
             }
 
             dispatch(setShowCreate(false));
+
             if (onSuccess) onSuccess();
         } catch (err) {
             console.error("Failed to submit article:", err);
@@ -123,9 +122,9 @@ export function ArticleForm({ mode, initialData, onSuccess }: ArticleFormProps) 
                                     alt="Thumbnail"
                                     className="h-full w-full object-cover rounded-md"
                                 />
-                            ) : initialData?.thumbnailUrl ? (
+                            ) : initialData?.imageUrl ? (
                                 <img
-                                    src={initialData.thumbnailUrl}
+                                    src={initialData.imageUrl}
                                     alt="Thumbnail"
                                     className="h-full w-full object-cover rounded-md"
                                 />

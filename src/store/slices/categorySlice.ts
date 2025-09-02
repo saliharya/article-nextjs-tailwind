@@ -8,6 +8,7 @@ import {
 } from "@/api/article/ArticleApi";
 import { CategoryResponse } from "@/api/article/response/categoryResponse";
 import { CategorySliceState } from "@/states/categories/categorySliceState";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 const initialState: CategorySliceState = {
     list: {
@@ -33,8 +34,8 @@ export const fetchCategories = createAsyncThunk<
     try {
         const response = await getCategories(params);
         return response;
-    } catch (error: any) {
-        return rejectWithValue(error.response?.data || "Failed to fetch categories");
+    } catch (error) {
+        return rejectWithValue(getErrorMessage(error));
     }
 });
 
@@ -46,8 +47,8 @@ export const createCategoryThunk = createAsyncThunk<
     try {
         const newCategory = await createCategory(data);
         return newCategory;
-    } catch (error: any) {
-        return rejectWithValue(error.response?.data || "Failed to create category");
+    } catch (error) {
+        return rejectWithValue(getErrorMessage(error));
     }
 });
 
@@ -59,8 +60,8 @@ export const updateCategoryThunk = createAsyncThunk<
     try {
         const updated = await updateCategory(id, { name });
         return updated;
-    } catch (error: any) {
-        return rejectWithValue(error.response?.data || "Failed to update category");
+    } catch (error) {
+        return rejectWithValue(getErrorMessage(error));
     }
 });
 
@@ -72,8 +73,8 @@ export const deleteCategoryThunk = createAsyncThunk<
     try {
         await deleteCategory(id);
         return id;
-    } catch (error: any) {
-        return rejectWithValue(error.response?.data || "Failed to delete category");
+    } catch (error) {
+        return rejectWithValue(getErrorMessage(error));
     }
 });
 

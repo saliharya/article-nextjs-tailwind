@@ -1,17 +1,22 @@
 export function getErrorMessage(error: unknown): string {
-    if (!error) return "";
-    if (typeof error === "string") return error;
-    if (typeof error === "object") {
-        if ('message' in error && typeof (error as any).message === 'string') {
-            return (error as any).message;
-        }
-        if ('error' in error && typeof (error as any).error === 'string') {
-            return (error as any).error;
-        }
-        if ('detail' in error && typeof (error as any).detail === 'string') {
-            return (error as any).detail;
-        }
-        return JSON.stringify(error);
+    if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof (error as { response?: unknown }).response === "object" &&
+        (error as { response?: { data?: { error?: string } } }).response !== null
+    ) {
+        const err = error as { response?: { data?: { error?: string }, message?: string }, message?: string };
+        return err.response?.data?.error ?? err.message ?? "Unknown error";
     }
-    return "Something went wrong";
+
+    if (typeof error === "string") {
+        return error;
+    }
+
+    if (error instanceof Error) {
+        return error.message;
+    }
+
+    return "Unknown error";
 }

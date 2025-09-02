@@ -10,6 +10,7 @@ import { DeleteModal } from "@/components/delete-modal"
 import AdminCategoryContent from "@/components/admin-category-content"
 import { closeDeleteModal, closeForm, createCategoryThunk, deleteCategoryThunk, setShowDeleteModal, updateCategoryThunk } from "@/store/slices/categorySlice"
 import CategoryFormModal from "@/components/category-form-modal"
+import { CategoryInput } from "@/models/category"
 
 export default function CategoriesPage() {
     const dispatch = useAppDispatch()
@@ -22,7 +23,7 @@ export default function CategoriesPage() {
         state.categoryReducer.list.items.find((c) => c.id === categoryId)
     );
 
-    const handleCreate = (data: any) => {
+    const handleCreate = (data: CategoryInput) => {
         dispatch(createCategoryThunk(data))
             .unwrap()
             .then(() => {
@@ -30,7 +31,7 @@ export default function CategoriesPage() {
             })
     }
 
-    const handleUpdate = (data: any) => {
+    const handleUpdate = (data: CategoryInput) => {
         if (!categoryId) return
         dispatch(updateCategoryThunk({ id: categoryId, ...data }))
             .unwrap()

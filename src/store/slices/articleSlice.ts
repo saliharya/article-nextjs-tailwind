@@ -8,6 +8,7 @@ import {
     createArticle as createArticleApi,
     updateArticle as updateArticleApi,
 } from "@/api/article/ArticleApi"
+import { getErrorMessage } from "@/utils/getErrorMessage"
 
 export const fetchArticles = createAsyncThunk<
     ArticleResponse,
@@ -17,8 +18,8 @@ export const fetchArticles = createAsyncThunk<
     try {
         const response = await getArticles(params)
         return response
-    } catch (error: any) {
-        return rejectWithValue(error.response?.data || "Failed to fetch articles")
+    } catch (error) {
+        return rejectWithValue(getErrorMessage(error));
     }
 })
 
@@ -30,8 +31,8 @@ export const fetchArticleById = createAsyncThunk<
     try {
         const article = await getArticleDetail(id)
         return article
-    } catch (error: any) {
-        return rejectWithValue(error.response?.data || "Article not found")
+    } catch (error) {
+        return rejectWithValue(getErrorMessage(error));
     }
 })
 
@@ -43,8 +44,8 @@ export const createArticleThunk = createAsyncThunk<
     try {
         const newArticle = await createArticleApi(data)
         return newArticle
-    } catch (error: any) {
-        return rejectWithValue(error.response?.data || "Failed to create article")
+    } catch (error) {
+        return rejectWithValue(getErrorMessage(error));
     }
 })
 
@@ -56,8 +57,8 @@ export const updateArticleThunk = createAsyncThunk<
     try {
         const updated = await updateArticleApi(id, data)
         return updated
-    } catch (error: any) {
-        return rejectWithValue(error.response?.data || "Failed to update article")
+    } catch (error) {
+        return rejectWithValue(getErrorMessage(error));
     }
 })
 
@@ -69,8 +70,8 @@ export const deleteArticleThunk = createAsyncThunk<
     try {
         await deleteArticle(id)
         return id
-    } catch (error: any) {
-        return rejectWithValue(error.response?.data || "Failed to delete article")
+    } catch (error) {
+        return rejectWithValue(getErrorMessage(error));
     }
 })
 
