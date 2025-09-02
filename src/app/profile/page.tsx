@@ -1,5 +1,6 @@
 'use client'
 import { useAppSelector } from '@/store/hooks';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 
 interface ProfileFieldProps {
@@ -15,12 +16,9 @@ const ProfileField: React.FC<ProfileFieldProps> = ({ label, value }) => (
     </div>
 );
 
-interface UserProfilePageProps {
-    onBackToHomeClick: () => void;
-}
-
-const UserProfilePage: React.FC<UserProfilePageProps> = ({ onBackToHomeClick }) => {
+const UserProfilePage: React.FC = () => {
     const user = useAppSelector((state) => state.authReducer.user);
+    const router = useRouter();
 
     if (!user) {
         return (
@@ -31,6 +29,14 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ onBackToHomeClick }) 
     }
 
     const initial = user.username.charAt(0).toUpperCase();
+
+    const handleBackToHome = () => {
+        if (user.role === 'Admin') {
+            router.push('/admin/articles');
+        } else {
+            router.push('/');
+        }
+    };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -47,7 +53,7 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ onBackToHomeClick }) 
                     <ProfileField label="Role" value={user.role} />
                 </div>
                 <button
-                    onClick={onBackToHomeClick}
+                    onClick={handleBackToHome}
                     className="w-[368px] h-[40px] bg-blue-600 text-white rounded-md flex items-center justify-center px-4 py-2 text-base font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 gap-1.5"
                 >
                     Back to home
