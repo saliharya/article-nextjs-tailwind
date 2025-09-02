@@ -11,6 +11,7 @@ import { useState } from "react"
 import { fetchProfile, loginUser } from "@/store/slices/authSlice"
 import { useRouter } from "next/navigation"
 import Logo from "./logo"
+import { User } from "@/models/user"
 
 export function LoginForm({
     className,
@@ -25,18 +26,24 @@ export function LoginForm({
     const [password, setPassword] = useState("")
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
+        e.preventDefault();
 
-        const result = await dispatch(loginUser({ username: username, password }))
+        const result = await dispatch(loginUser({ username, password }));
 
         if (loginUser.fulfilled.match(result)) {
-            await dispatch(fetchProfile())
+            const profileResult = await dispatch(fetchProfile());
 
-            router.push("/")
+            const profile = profileResult.payload as User;
+
+            if (profile.role === "Admin") {
+                router.push("/admin/articles");
+            } else {
+                router.push("/");
+            }
         } else {
-            console.error('Login failed: ', result.payload)
+            console.error("Login failed: ", result.payload);
         }
-    }
+    };
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
