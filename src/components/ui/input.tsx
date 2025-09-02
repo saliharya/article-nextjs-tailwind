@@ -4,7 +4,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
 
-interface InputProps extends React.ComponentProps<"input"> { }
+type InputProps = React.ComponentProps<"input">;
 
 function Input({ className, type, ...props }: InputProps) {
   const [showPassword, setShowPassword] = React.useState(false);
