@@ -50,7 +50,7 @@ export default function HeroSection() {
             <Image src={heroImage} alt="hero" fill className="object-cover" />
             <div className="absolute inset-0 bg-[#2563EBDB]" />
 
-            <div className="absolute top-0 left-0 w-full">
+            <div className="absolute top-0 left-0 w-full z-10">
                 <Navbar logoVariant={logoVariant} />
             </div>
 
