@@ -11,8 +11,9 @@ import noImage from '../../public/images/no-image.png'
 import { fetchArticleById, openDeleteModal, setFormMode, setShowCreate } from "@/store/slices/articleSlice"
 import { useAppDispatch } from "@/store/hooks"
 import { format } from "date-fns"
+import { Article } from "@/models/article"
 
-export function ArticleTable({ articles }: { articles: any[] }) {
+export function ArticleTable({ articles }: { articles: Article[] }) {
 
     const dispatch = useAppDispatch()
 

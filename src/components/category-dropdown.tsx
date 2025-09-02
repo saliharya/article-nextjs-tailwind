@@ -3,11 +3,12 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
+import { Category } from '@/models/category'
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
 import { ChevronDown, Plus } from 'lucide-react'
 
 export function CategoryDropdown({ categories, selectedCategory, onSelect }: {
-    categories: any[],
+    categories: Category[],
     selectedCategory: string | null,
     onSelect: (id: string) => void
 }) {

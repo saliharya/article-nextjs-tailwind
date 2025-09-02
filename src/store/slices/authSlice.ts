@@ -8,6 +8,7 @@ import { apiClient } from "@/api/client";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { AuthState } from "../../states/auth/authState";
 import Cookies from "js-cookie";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 const initialState: AuthState = {
     user: typeof window !== "undefined" ? JSON.parse(Cookies.get("user") || "null") : null,
@@ -16,26 +17,26 @@ const initialState: AuthState = {
     error: null,
 };
 
-export const loginUser = createAsyncThunk<LoginResponse, LoginRequest>(
+export const loginUser = createAsyncThunk<LoginResponse, LoginRequest, { rejectValue: string }>(
     "auth/loginUser",
     async (data, { rejectWithValue }) => {
         try {
             const res = await login(data);
             return res;
-        } catch (err: any) {
-            return rejectWithValue(err.response?.data || "Login failed");
+        } catch (err: unknown) {
+            return rejectWithValue(getErrorMessage(err));
         }
     }
 );
 
-export const registerUser = createAsyncThunk<RegisterResponse, RegisterRequest>(
+export const registerUser = createAsyncThunk<RegisterResponse, RegisterRequest, { rejectValue: string }>(
     "auth/registerUser",
     async (data, { rejectWithValue }) => {
         try {
             const res = await register(data);
             return res;
-        } catch (err: any) {
-            return rejectWithValue(err.response?.data || "Register failed");
+        } catch (err: unknown) {
+            return rejectWithValue(getErrorMessage(err));
         }
     }
 );
@@ -49,8 +50,8 @@ export const fetchProfile = createAsyncThunk<UserProfileResponse>(
                 headers: { Authorization: `Bearer ${token}` },
             });
             return res.data;
-        } catch (err: any) {
-            return rejectWithValue(err.response?.data || "Failed to fetch profile");
+        } catch (err: unknown) {
+            return rejectWithValue(getErrorMessage(err));
         }
     }
 );
@@ -80,14 +81,14 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.token = action.payload.token;
                 Cookies.set("token", action.payload.token);
-                if ((action.payload as any).user) {
-                    state.user = (action.payload as any).user;
-                    Cookies.set("user", JSON.stringify((action.payload as any).user));
+                if (action.payload.user) {
+                    state.user = action.payload.user;
+                    Cookies.set("user", JSON.stringify(action.payload.user));
                 }
             })
-            .addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
+            .addCase(loginUser.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
-                state.error = action.payload;
+                state.error = action.payload as string || "Login failed";
             })
             .addCase(fetchProfile.fulfilled, (state, action: PayloadAction<UserProfileResponse>) => {
                 state.user = action.payload;
@@ -101,9 +102,9 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.error = null;
             })
-            .addCase(registerUser.rejected, (state, action: PayloadAction<any>) => {
+            .addCase(registerUser.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
-                state.error = action.payload;
+                state.error = action.payload as string || "Register failed";
             })
     },
 });
