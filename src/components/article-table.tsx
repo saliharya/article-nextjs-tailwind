@@ -45,7 +45,7 @@ export function ArticleTable({ articles }: { articles: any[] }) {
                                 className="w-[60px] h-[60px] rounded-[6px] object-cover mx-auto"
                             />
                         </TableCell>
-                        <TableCell className="text-slate-600 text-sm w-1/5">
+                        <TableCell className="text-slate-600 text-sm w-1/5 break-words whitespace-normal">
                             {article.title}
                         </TableCell>
                         <TableCell className="text-center text-slate-600 text-sm w-1/5">

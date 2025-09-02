@@ -1,7 +1,13 @@
-import { useEffect, useMemo } from "react"
+'use client'
+
+import React, { useState, useEffect, useMemo } from "react"
 import { ArrowLeft, Upload } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
-import { setShowCreate, setCategory, fetchArticles } from "@/store/slices/articleSlice"
+import {
+    setShowCreate,
+    setCategory,
+    fetchArticles,
+} from "@/store/slices/articleSlice"
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { CategoryDropdown } from "./category-dropdown"
 import RichTextEditor from "./rich-text-editor"
+import { createArticleThunk, updateArticleThunk } from "@/store/slices/articleSlice"
 
 interface ArticleFormProps {
     mode: "create" | "edit"
@@ -19,15 +26,10 @@ interface ArticleFormProps {
         categoryId?: string
         thumbnailUrl?: string
     }
-    onSubmit: (data: {
-        title: string
-        content: string
-        categoryId: string
-        thumbnail?: File | null
-    }) => void
+    onSuccess?: () => void
 }
 
-export function ArticleForm({ mode, initialData, onSubmit }: ArticleFormProps) {
+export function ArticleForm({ mode, initialData, onSuccess }: ArticleFormProps) {
     const dispatch = useAppDispatch()
     const { selectedCategory, items: articles, page, limit, searchTerm } =
         useAppSelector((state) => state.articleReducer.list)
@@ -52,6 +54,43 @@ export function ArticleForm({ mode, initialData, onSubmit }: ArticleFormProps) {
         )
     }, [dispatch, page, limit, selectedCategory, searchTerm])
 
+    const [title, setTitle] = useState(initialData?.title || "")
+    const [content, setContent] = useState(initialData?.content || "")
+    const [categoryId, setCategoryId] = useState(
+        initialData?.categoryId || selectedCategory || ""
+    )
+    const [thumbnail, setThumbnail] = useState<File | null>(null)
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setThumbnail(e.target.files[0])
+        }
+    }
+
+    const handleSubmit = async () => {
+        if (!title || !content || !categoryId) {
+            alert("Please fill in all required fields")
+            return
+        }
+
+        try {
+            if (mode === "create") {
+                await dispatch(
+                    createArticleThunk({ title, content, categoryId })
+                ).unwrap()
+            } else if (mode === "edit" && initialData?.id) {
+                await dispatch(
+                    updateArticleThunk({ id: initialData.id, title, content, categoryId })
+                ).unwrap()
+            }
+
+            dispatch(setShowCreate(false))
+            if (onSuccess) onSuccess()
+        } catch (err) {
+            console.error("Failed to submit article:", err)
+        }
+    }
+
     return (
         <div className="p-6">
             <Card className="w-full h-full">
@@ -71,7 +110,13 @@ export function ArticleForm({ mode, initialData, onSubmit }: ArticleFormProps) {
                             htmlFor="file-upload"
                             className="flex flex-col items-center justify-center border border-dashed rounded-md p-6 cursor-pointer hover:bg-gray-50 h-[187px] w-[223px]"
                         >
-                            {initialData?.thumbnailUrl ? (
+                            {thumbnail ? (
+                                <img
+                                    src={URL.createObjectURL(thumbnail)}
+                                    alt="Thumbnail"
+                                    className="h-full w-full object-cover rounded-md"
+                                />
+                            ) : initialData?.thumbnailUrl ? (
                                 <img
                                     src={initialData.thumbnailUrl}
                                     alt="Thumbnail"
@@ -84,7 +129,7 @@ export function ArticleForm({ mode, initialData, onSubmit }: ArticleFormProps) {
                                         Click to select files
                                     </span>
                                     <span className="text-xs text-gray-400">
-                                        Support File Type : jpg or png
+                                        Support File Type: jpg or png
                                     </span>
                                 </>
                             )}
@@ -93,7 +138,7 @@ export function ArticleForm({ mode, initialData, onSubmit }: ArticleFormProps) {
                                 type="file"
                                 className="hidden"
                                 accept=".jpg,.jpeg,.png"
-                                onChange={() => null}
+                                onChange={handleFileChange}
                             />
                         </label>
                     </div>
@@ -102,7 +147,8 @@ export function ArticleForm({ mode, initialData, onSubmit }: ArticleFormProps) {
                         <Label>Title</Label>
                         <Input
                             placeholder="Input title"
-                            defaultValue={initialData?.title || ""}
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
                         />
                     </div>
 
@@ -110,8 +156,8 @@ export function ArticleForm({ mode, initialData, onSubmit }: ArticleFormProps) {
                         <Label>Category</Label>
                         <CategoryDropdown
                             categories={categories}
-                            selectedCategory={initialData?.categoryId || selectedCategory}
-                            onSelect={(id) => dispatch(setCategory(id))}
+                            selectedCategory={categoryId}
+                            onSelect={(id) => setCategoryId(id)}
                         />
                         <p className="text-xs text-gray-500">
                             The existing category list can be seen in the{" "}
@@ -124,7 +170,7 @@ export function ArticleForm({ mode, initialData, onSubmit }: ArticleFormProps) {
 
                     <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium">Content</label>
-                        <RichTextEditor content={initialData?.content || ""} />
+                        <RichTextEditor content={content} onChange={setContent} />
                     </div>
                 </CardContent>
 
@@ -136,7 +182,10 @@ export function ArticleForm({ mode, initialData, onSubmit }: ArticleFormProps) {
                         Cancel
                     </Button>
                     <Button variant="secondary">Preview</Button>
-                    <Button className="bg-blue-600 hover:bg-blue-700">
+                    <Button
+                        className="bg-blue-600 hover:bg-blue-700"
+                        onClick={handleSubmit}
+                    >
                         {mode === "create" ? "Upload" : "Save Changes"}
                     </Button>
                 </CardFooter>

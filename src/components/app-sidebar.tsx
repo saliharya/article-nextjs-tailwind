@@ -87,12 +87,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 href={subItem.url}
                                 className={`flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors
                                 ${isActive
-                                    ? "bg-blue-500 text-white hover:bg-blue-600"
+                                    ? "bg-blue-500 text-white hover:bg-gray-100"
                                     : "text-white hover:bg-gray-100"
                                   }`}
                               >
                                 <subItem.icon
-                                  className={`h-4 w-4 ${isActive ? "text-white" : "text-gray-500"}`}
+                                  className={`h-4 w-4 text-white`}
                                 />
                                 {subItem.title}
                               </a>
