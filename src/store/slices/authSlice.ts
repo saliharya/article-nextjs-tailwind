@@ -7,10 +7,11 @@ import { UserProfileResponse } from "@/api/auth/response/userProfileResponse";
 import { apiClient } from "@/api/client";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { AuthState } from "../../states/auth/authState";
+import Cookies from "js-cookie";
 
 const initialState: AuthState = {
-    user: typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null,
-    token: typeof window !== "undefined" ? localStorage.getItem("token") : null,
+    user: typeof window !== "undefined" ? JSON.parse(Cookies.get("user") || "null") : null,
+    token: typeof window !== "undefined" ? Cookies.get("token") || null : null,
     loading: false,
     error: null,
 };
@@ -41,11 +42,9 @@ export const registerUser = createAsyncThunk<RegisterResponse, RegisterRequest>(
 
 export const fetchProfile = createAsyncThunk<UserProfileResponse>(
     "auth/fetchProfile",
-    async (_, { getState, rejectWithValue }) => {
-        const state = getState() as { authReducer: AuthState };
-        const token = state.authReducer.token || localStorage.getItem("token");
-
+    async (_, { rejectWithValue }) => {
         try {
+            const token = Cookies.get("token");
             const res = await apiClient.get<UserProfileResponse>("/auth/profile", {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -63,12 +62,12 @@ const authSlice = createSlice({
         logout: (state) => {
             state.user = null;
             state.token = null;
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
+            Cookies.remove("token");
+            Cookies.remove("user");
         },
         setUser: (state, action: PayloadAction<UserProfileResponse>) => {
             state.user = action.payload;
-            localStorage.setItem("user", JSON.stringify(action.payload));
+            Cookies.set("user", JSON.stringify(action.payload));
         },
     },
     extraReducers: (builder) => {
@@ -80,25 +79,25 @@ const authSlice = createSlice({
             .addCase(loginUser.fulfilled, (state, action: PayloadAction<LoginResponse>) => {
                 state.loading = false;
                 state.token = action.payload.token;
+                Cookies.set("token", action.payload.token);
                 if ((action.payload as any).user) {
                     state.user = (action.payload as any).user;
-                    localStorage.setItem("user", JSON.stringify((action.payload as any).user));
+                    Cookies.set("user", JSON.stringify((action.payload as any).user));
                 }
-                localStorage.setItem("token", action.payload.token);
             })
             .addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
                 state.loading = false;
                 state.error = action.payload;
             })
             .addCase(fetchProfile.fulfilled, (state, action: PayloadAction<UserProfileResponse>) => {
-                state.user = action.payload
-                localStorage.setItem('user', JSON.stringify(action.payload))
+                state.user = action.payload;
+                Cookies.set("user", JSON.stringify(action.payload));
             })
             .addCase(registerUser.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(registerUser.fulfilled, (state, action: PayloadAction<RegisterResponse>) => {
+            .addCase(registerUser.fulfilled, (state) => {
                 state.loading = false;
                 state.error = null;
             })
