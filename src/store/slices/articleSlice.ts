@@ -37,7 +37,7 @@ export const fetchArticleById = createAsyncThunk<
 
 export const createArticleThunk = createAsyncThunk<
     ArticleDetailResponse,
-    { title: string; content: string; categoryId: string },
+    { title: string; content: string; categoryId: string; imageUrl?: string },
     { rejectValue: string }
 >("articles/createArticle", async (data, { rejectWithValue }) => {
     try {
@@ -50,7 +50,7 @@ export const createArticleThunk = createAsyncThunk<
 
 export const updateArticleThunk = createAsyncThunk<
     ArticleDetailResponse,
-    { id: string; title: string; content: string; categoryId: string },
+    { id: string; title: string; content: string; categoryId: string; imageUrl?: string },
     { rejectValue: string }
 >("articles/updateArticle", async ({ id, ...data }, { rejectWithValue }) => {
     try {

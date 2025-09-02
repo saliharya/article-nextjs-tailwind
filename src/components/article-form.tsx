@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator"
 import { CategoryDropdown } from "./category-dropdown"
 import RichTextEditor from "./rich-text-editor"
 import { createArticleThunk, updateArticleThunk } from "@/store/slices/articleSlice"
+import { uploadThumbnail } from "@/api/article/ArticleApi"
 
 interface ArticleFormProps {
     mode: "create" | "edit"
@@ -24,7 +25,7 @@ interface ArticleFormProps {
         title?: string
         content?: string
         categoryId?: string
-        thumbnailUrl?: string
+        imageUrl?: string
     }
     onSuccess?: () => void
 }
@@ -74,20 +75,26 @@ export function ArticleForm({ mode, initialData, onSuccess }: ArticleFormProps) 
         }
 
         try {
+            let imageUrl: string | undefined = initialData?.imageUrl;
+
+            if (thumbnail) {
+                imageUrl = await uploadThumbnail(thumbnail);
+            }
+
             if (mode === "create") {
                 await dispatch(
-                    createArticleThunk({ title, content, categoryId })
+                    createArticleThunk({ title, content, categoryId, imageUrl })
                 ).unwrap()
             } else if (mode === "edit" && initialData?.id) {
                 await dispatch(
-                    updateArticleThunk({ id: initialData.id, title, content, categoryId })
+                    updateArticleThunk({ id: initialData.id, title, content, categoryId, imageUrl })
                 ).unwrap()
             }
 
-            dispatch(setShowCreate(false))
-            if (onSuccess) onSuccess()
+            dispatch(setShowCreate(false));
+            if (onSuccess) onSuccess();
         } catch (err) {
-            console.error("Failed to submit article:", err)
+            console.error("Failed to submit article:", err);
         }
     }
 

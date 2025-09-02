@@ -6,7 +6,7 @@ import { ArticleDetailResponse } from "./response/articleResponse"
 import { CategoryResponse } from "./response/categoryResponse"
 
 export const createArticle = async (
-    data: { title: string; content: string; categoryId: string }
+    data: { title: string; content: string; categoryId: string, imageUrl?: string }
 ): Promise<ArticleDetailResponse> => {
     const response = await apiClient.post<ArticleDetailResponse>("/articles", data)
     return response.data
@@ -27,7 +27,7 @@ export const getArticleDetail = async (id: string): Promise<ArticleDetailRespons
 
 export const updateArticle = async (
     id: string,
-    data: { title: string; content: string; categoryId: string }
+    data: { title: string; content: string; categoryId: string, imageUrl?: string }
 ): Promise<ArticleDetailResponse> => {
     const response = await apiClient.put<ArticleDetailResponse>(`/articles/${id}`, data)
     return response.data
@@ -36,6 +36,16 @@ export const updateArticle = async (
 export const deleteArticle = async (id: string): Promise<void> => {
     await apiClient.delete(`/articles/${id}`)
 }
+export const uploadThumbnail = async (image: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("image", image);
+
+    const response = await apiClient.post<{ imageUrl: string }>("/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return response.data.imageUrl;
+};
 
 export const getCategories = async (
     params?: { page?: number; limit?: number; search?: string }

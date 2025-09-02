@@ -18,4 +18,5 @@ export interface ArticleInput {
     title: string;
     content: string;
     categoryId: string;
+    imageUrl?: string
 }
